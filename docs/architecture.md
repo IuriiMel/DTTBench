@@ -7,7 +7,7 @@ command processing, port communication, logging, data visualization, and utility
 
 The component diagram shows the main application components and their dependencies.
 
-![](images/Components.png)
+![](images/components.png)
 
 ## Main Components
 
@@ -97,4 +97,4 @@ The resulting data is logged, and plot data is forwarded to
 The sequence diagram illustrates the interaction between the main components during command execution.  
 For more detailed information see the full [sequence-diagram](images/sequence.png).
 
-![](images/Sequence_short.png)
+![](images/sequence_short.png)
