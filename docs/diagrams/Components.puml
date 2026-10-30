@@ -1,0 +1,158 @@
+@startuml components
+!theme plain
+title DTTBench - Component Architecture
+
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam roundcorner 10
+
+' ========== UI LAYER ==========
+package "UI Layer" as UI #E3F2FD {
+    [MainController] as MC
+    [SeparateModeController] as SMC
+    [CoordinatedModeController] as CMC
+    [CommandListController] as CLC
+    [FindReplace] as FR
+
+    package "Tabs" as Tabs {
+        [VoltageTab] as VT
+        [FrequencyTab] as FT
+        [RelayTab] as RT
+    }
+}
+
+' ========== CONTROLLER LAYER ==========
+package "Controller Layer" as CL #FFF3E0 {
+    [ViewModeManager] as VMM
+    [ModeController] as ModeCtrl <<interface>>
+    [CommandTab] as CmdTab <<interface>>
+}
+
+' ========== SCRIPT LAYER ==========
+package "Script Layer" as SL #F3E5F5 {
+    [ScriptEngine] as SE
+}
+
+' ========== HANDLER LAYER ==========
+package "Handler Layer" as HL #E8F5E9 {
+    [HandlerRegistry] as HR
+    [CommandHandler] as CH <<interface>>
+    [CommandDefinition] as CD <<interface>>
+    [EnumCommandMatcher] as ECM
+    [CommandResult] as CR
+
+    package "Devices" as Devices {
+        [SC18IMHandler] as SC18IM
+        [BH1745NUCHandler] as BH1745
+        [DefaultCommandHandler] as DCH
+    }
+}
+
+' ========== PORT LAYER ==========
+package "Port Layer" as PL #FFEBEE {
+    [PortManager] as PM
+    [PortSession] as PS
+    [SessionListenerManager] as SLM
+    [SessionListener] as S <<interface>>
+    [PortID] as PID <<enum>>
+}
+
+' ========== PLOT LAYER ==========
+package "Plot Layer" as PoL #E0F7FA {
+    [PlotterManager] as PoM
+    [Plotter] as Po
+    [TimeMode] as TM <<enum>>
+}
+
+' ========== CONFIG LAYER ==========
+package "Config Layer" as CfgL #F1F8E9 {
+    [Config] as Cfg
+    [BuildInfo] as BI
+}
+
+' ========== UTILS LAYER ==========
+package "Utils Layer" as UL #FCE4EC {
+    [ByteUtils] as BU
+    [FileUtils] as FU
+    [UtilsRunner] as UR
+}
+
+' ========== MODEL LAYER ==========
+package "Model Layer" as ML #EDE7F6 {
+    [Command] as Cmd
+    [About] as Ab
+    [AlertService] as AS
+}
+
+' ========== ENTRY POINT ==========
+[Main] as Main
+
+' ========== RELATIONSHIPS ==========
+
+' Main entry
+Main --> MC : initializes
+Main --> Cfg : loads config
+
+' UI → Controller Layer
+MC --> VMM : manages modes
+MC --> CLC : opens command list
+VMM --> SMC : separate mode
+VMM --> CMC : coordinated mode
+
+' Controllers → Script Layer
+SMC --> SE : executes scripts
+CMC --> SE : executes scripts
+
+' Controllers → Port Layer
+SMC --> PM : manages ports
+CMC --> PM : manages ports
+SMC --> SLM : receives events
+CMC --> SLM : receives events
+
+' Controllers → Plot Layer
+SMC --> PoM : plots data
+CMC --> PoM : plots data
+
+' Controllers → Tabs
+CLC --> VT
+CLC --> FT
+CLC --> RT
+
+' Script → Handler Layer
+SE --> HR : gets handler
+SE --> PM : sends commands
+
+' Handler Layer internal
+HR --> CH : selects handler
+HR --> DCH : fallback
+CH ..|> SC18IM
+CH ..|> BH1745
+CH ..|> DCH
+SC18IM --> ECM : uses matcher
+BH1745 --> ECM : uses matcher
+ECM --> CD : matches definitions
+
+' Script → Plot Layer
+SE --> PoM : adds plot data
+
+' Port Layer internal
+PM --> PS : manages sessions
+PM --> SLM : notifies events
+SLM --> SL : routes to controller
+PS --> SL : port events
+
+' Plot Layer internal
+PoM --> Po : creates plotters
+
+' Utils used by multiple layers
+BU --> PS : byte conversion
+BU --> CH : data formatting
+FU --> MC : file operations
+UR --> SE : external utils
+
+' Model used across layers
+AS --> MC : error dialogs
+Ab --> MC : about dialog
+
+@enduml

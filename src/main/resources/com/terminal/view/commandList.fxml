@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="800.0"
+            style="-fx-font-family: 'Consolas'; -fx-font-size: 12px;"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.terminal.controller.CommandListController">
+
+   <TableView fx:id="commandsTable" prefHeight="400.0" prefWidth="400.0">
+      <columns>
+         <TableColumn fx:id="descriptionColumn" prefWidth="250.0" text="Description" />
+         <TableColumn fx:id="commandsColumn" prefWidth="150.0" text="Command" />
+      </columns>
+   </TableView>
+
+   <TabPane fx:id="tabPane" layoutX="400.0" prefHeight="360.0" prefWidth="400.0" />
+
+   <Button layoutX="405.0" layoutY="370.0" mnemonicParsing="false" onAction="#deleteCommand" text="Delete from list" />
+   <Button layoutX="640.0" layoutY="370.0" mnemonicParsing="false" onAction="#loadDefaultCommands" text="Load Default Commands" />
+
+</AnchorPane>

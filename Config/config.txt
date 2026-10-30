@@ -1,0 +1,5 @@
+#DTTBench configuration
+#Thu Sep 24 15:50:20 EEST 2026
+LogsDIR=Logs
+ScriptsDIR=Scripts
+UtilsDIR=Utils

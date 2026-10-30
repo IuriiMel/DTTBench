@@ -1,0 +1,34 @@
+DTTBench Syntax
+==========================
+
+DTTBench provides a scripting language for processing device
+communication and automating test sequences.
+
+Command Syntax
+--------------
+
+keywords:
+-d x	    	-	divider;
+-u x	    	-	units;
+-c x	    	-	comments (for commands and command line);
+-r x	    	-	repeats;
+( ... )-r x*	    -	block repeats;
+-l [x-x]    	-	limits;
+-lw [x-x]   	-	limits (warnings);
+-run x	    	-	run util (for command line);
+-stop x     	-	stop util (for command line);
+-open x x   	-	open port baud (for command line);
+-close x    	-	close port (for command line);
+-space	    	-	space (for command line);
+//	        -	comment;
+/* ... */	-	block comment;
+
+
+* Block repetition syntax:
+  (
+  -c Hello
+  sleep(100)
+  -space
+  )-r x
+
+  The opening and closing parentheses must be on separate lines.

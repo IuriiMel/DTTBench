@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
+
+<BorderPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1200.0" style="-fx-font-family: 'Consolas'; -fx-font-size: 12px;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.terminal.controller.CoordinatedModeController">
+
+   <!-- ================= LEFT PANEL: PORT 1 ================= -->
+   <left>
+      <BorderPane prefWidth="235.0" style="-fx-border-color: #cccccc; -fx-border-width: 1;">
+         <top>
+            <HBox style="-fx-background-color: #e0e0e0; -fx-padding: 8;">
+               <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="Port 1" />
+               <Region HBox.hgrow="ALWAYS" />
+               <Label fx:id="firstStatusLabel" text="Disconnected" textFill="RED"/>
+            </HBox>
+         </top>
+
+         <center>
+            <VBox spacing="15" style="-fx-padding: 10;">
+
+               <!-- Connection Section -->
+               <VBox spacing="8">
+                  <Label style="-fx-font-weight: bold; -fx-padding: 5 0 0 0;" text="Connection" />
+                  <HBox alignment="CENTER_RIGHT" spacing="10">
+                     <Label text="Port:" />
+                     <ComboBox fx:id="firstPortList" prefWidth="120" />
+                  </HBox>
+                  <HBox alignment="CENTER_RIGHT" spacing="10">
+                     <Label text="Baud Rate:" />
+                     <ComboBox fx:id="firstBaudRate" prefWidth="120" />
+                  </HBox>
+                  <Button fx:id="firstOpenDual" maxWidth="Infinity" onAction="#firstOpen" text="Open" />
+               </VBox>
+
+               <Separator />
+
+               <!-- Control Lines Section -->
+               <VBox spacing="8">
+                  <Label style="-fx-font-weight: bold; -fx-padding: 5 0 0 0;" text="Control Lines" />
+                  <HBox spacing="15">
+                     <RadioButton fx:id="firstRTS" onAction="#setFirstRTS" text="RTS" />
+                     <RadioButton fx:id="firstCTS" text="CTS" />
+                  </HBox>
+                  <HBox spacing="15">
+                     <RadioButton fx:id="firstDTR" onAction="#setFirstDTR" text="DTR" />
+                     <RadioButton fx:id="firstDSR" text="DSR" />
+                  </HBox>
+               </VBox>
+
+               <Separator />
+
+               <!-- Commands Section -->
+               <VBox spacing="8">
+                  <Label style="-fx-font-weight: bold; -fx-padding: 5 0 0 0;" text="Commands" />
+                  <Button maxWidth="Infinity" onAction="#initFirstPort" text="Init Command" />
+                  <Button maxWidth="Infinity" onAction="#addFirstRTS" text="Add RTS Command">
+                     <tooltip>
+                        <Tooltip text="Add RTS toggle command to queue" />
+                     </tooltip>
+                  </Button>
+                  <Button maxWidth="Infinity" onAction="#addFirstDTR" text="Add DTR Command">
+                     <tooltip>
+                        <Tooltip text="Add DTR toggle command to queue" />
+                     </tooltip>
+                  </Button>
+               </VBox>
+
+               <Separator />
+
+               <!-- Additional Ports -->
+               <TitledPane expanded="false" text="Additional Ports">
+                  <ScrollPane fx:id="scrollPane" fitToWidth="true">
+                     <VBox fx:id="additionalPortsBox" spacing="8" />
+                  </ScrollPane>
+               </TitledPane>
+
+            </VBox>
+         </center>
+      </BorderPane>
+   </left>
+
+   <!-- ================= CENTER: SHARED LOG ================= -->
+   <center>
+      <BorderPane style="-fx-border-color: #cccccc; -fx-border-width: 1; -fx-border-left: 0; -fx-border-right: 0;">
+         <top>
+            <HBox style="-fx-background-color: #d0d0d0; -fx-padding: 8;">
+               <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="Coordinated Mode Log" />
+            </HBox>
+         </top>
+
+         <bottom>
+            <VBox spacing="10" style="-fx-padding: 10;">
+
+               <!-- Input Area -->
+               <TextArea fx:id="dualTextArea" prefRowCount="9" promptText="Enter command..." style="-fx-font-family: 'Consolas';" />
+
+               <!-- Command Modifiers -->
+               <HBox spacing="5">
+                  <Button onAction="#addFirstPrefix" text="Prefix 1">
+                     <tooltip>
+                        <Tooltip text="Add prefix from Port 1" />
+                     </tooltip>
+                  </Button>
+                  <Button onAction="#addSecondPrefix" text="Prefix 2">
+                     <tooltip>
+                        <Tooltip text="Add prefix from Port 2" />
+                     </tooltip>
+                  </Button>
+                  <Button onAction="#addTimeout" text="Add Delay">
+                     <tooltip>
+                        <Tooltip text="Add delay between commands (ms)" />
+                     </tooltip>
+                  </Button>
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Text fx:id="dualStepMode" strokeType="OUTSIDE" strokeWidth="0.0" text="StepMode:">
+                     <HBox.margin>
+                        <Insets top="5.0" />
+                     </HBox.margin>
+                  </Text>
+                  <Button fx:id="previousStepButton" onAction="#dualPreviousStep" text="◀">
+                     <tooltip>
+                        <Tooltip hideDelay="10ms" showDelay="10ms" text="Previous step" />
+                     </tooltip>
+                  </Button>
+                  <Button fx:id="nextStepButton" onAction="#dualNextStep" text="▶">
+                     <tooltip>
+                        <Tooltip hideDelay="10ms" showDelay="10ms" text="Next step" />
+                     </tooltip>
+                  </Button>
+                  <Button fx:id="repeatStepButton" onAction="#dualRepeatCommand" text="🔁">
+                     <tooltip>
+                        <Tooltip hideDelay="10ms" showDelay="10ms" text="Repeat command" />
+                     </tooltip>
+                  </Button>
+                  <Button fx:id="resetStepButton" onAction="#dualRestartCommand" text="↻">
+                     <tooltip>
+                        <Tooltip hideDelay="10ms" showDelay="10ms" text="Restart" />
+                     </tooltip>
+                  </Button>
+                  <Button fx:id="stopButton" onAction="#dualStopStepMode" text="■">
+                     <tooltip>
+                        <Tooltip hideDelay="10ms" showDelay="10ms" text="Stop step mode" />
+                     </tooltip>
+                  </Button>
+               </HBox>
+
+               <!-- Send Controls -->
+               <HBox alignment="CENTER_LEFT" spacing="10">
+                  <Label text="Times:" />
+                  <TextField fx:id="dualTimes" prefWidth="60" promptText="1" />
+                  <Label text="Interval (ms):" />
+                  <TextField fx:id="dualIntervals" prefWidth="80" promptText="100" />
+                  <Button onAction="#dualSend" style="-fx-base: #cdddbf;" text="Send" />
+                  <Button onAction="#dualStop" style="-fx-base: #dcc0b8;" text="Stop" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Text fx:id="dualCounterRemainingTimes" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-fill: #666666;" />
+               </HBox>
+
+            </VBox>
+         </bottom>
+         <center>
+            <ScrollPane fx:id="dualScrollPane" BorderPane.alignment="CENTER">
+               <TextFlow fx:id="dualTextFlow" />
+            </ScrollPane>
+         </center>
+      </BorderPane>
+   </center>
+
+   <!-- ================= RIGHT PANEL: PORT 2 ================= -->
+   <right>
+      <BorderPane prefWidth="235.0" style="-fx-border-color: #cccccc; -fx-border-width: 1; -fx-background-color: #f0ece4;">
+         <top>
+            <HBox style="-fx-background-color: #e0e0e0; -fx-padding: 8;">
+               <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="Port 2" />
+               <Region HBox.hgrow="ALWAYS" />
+               <Label fx:id="secondStatusLabel" text="Disconnected" textFill="RED"/>
+            </HBox>
+         </top>
+
+         <center>
+            <ScrollPane fitToWidth="true">
+               <VBox spacing="15" style="-fx-padding: 10;">
+
+                  <!-- Connection Section -->
+                  <VBox spacing="8">
+                     <Label style="-fx-font-weight: bold; -fx-padding: 5 0 0 0;" text="Connection" />
+                     <HBox alignment="CENTER_RIGHT" spacing="10">
+                        <Label text="Port:" />
+                        <ComboBox fx:id="secondPortList" prefWidth="120" />
+                     </HBox>
+                     <HBox alignment="CENTER_RIGHT" spacing="10">
+                        <Label text="Baud Rate:" />
+                        <ComboBox fx:id="secondBaudRate" prefWidth="120" />
+                     </HBox>
+                     <Button fx:id="secondOpenDual" maxWidth="Infinity" onAction="#secondOpen" text="Open" />
+                  </VBox>
+
+                  <Separator />
+
+                  <!-- Control Lines Section -->
+                  <VBox spacing="8">
+                     <Label style="-fx-font-weight: bold; -fx-padding: 5 0 0 0;" text="Control Lines" />
+                     <HBox spacing="15">
+                        <RadioButton fx:id="secondRTS" onAction="#setSecondRTS" text="RTS" />
+                        <RadioButton fx:id="secondCTS" text="CTS" />
+                     </HBox>
+                     <HBox spacing="15">
+                        <RadioButton fx:id="secondDTR" onAction="#setSecondDTR" text="DTR" />
+                        <RadioButton fx:id="secondDSR" text="DSR" />
+                     </HBox>
+                  </VBox>
+
+                  <Separator />
+
+                  <!-- Commands Section -->
+                  <VBox spacing="8">
+                     <Label style="-fx-font-weight: bold; -fx-padding: 5 0 0 0;" text="Commands" />
+                     <Button maxWidth="Infinity" onAction="#initSecondPort" text="Init Command" />
+                     <Button maxWidth="Infinity" onAction="#addSecondRTS" text="Add RTS Command">
+                        <tooltip>
+                           <Tooltip text="Add RTS toggle command to queue" />
+                        </tooltip>
+                     </Button>
+                     <Button maxWidth="Infinity" onAction="#addSecondDTR" text="Add DTR Command">
+                        <tooltip>
+                           <Tooltip text="Add DTR toggle command to queue" />
+                        </tooltip>
+                     </Button>
+                  </VBox>
+
+               </VBox>
+            </ScrollPane>
+         </center>
+      </BorderPane>
+   </right>
+
+</BorderPane>

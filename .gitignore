@@ -1,0 +1,17 @@
+### IntelliJ IDEA ###
+.idea/
+*.iml
+
+### Maven / Build ###
+out/
+target/
+
+### Application logs ###
+/AppLogs/
+
+### User data ###
+/commands.json
+
+### OS files ###
+.DS_Store
+Thumbs.db

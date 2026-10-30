@@ -1,0 +1,65 @@
+@startuml
+autonumber
+title DTTBench - Command Execution Flow
+
+actor User
+participant "UI Controller" as UI
+participant "ScriptEngine" as Script
+participant "PortManager" as PM
+participant "PortSession\n(Background Thread)" as Session
+participant "HandlerRegistry" as Registry
+participant "CommandHandler\n(by specificity)" as Handler
+participant "PlotterManager" as PlotMgr
+participant "SessionListenerManager" as SLM
+
+== User sends a command ==
+
+User -> UI : Clicks "Send" or starts script
+UI -> Script : execute(commandList, portId)
+
+Script -> PM : getSession(portId)
+PM --> Script : returns PortSession
+
+Script -> Session : send(byte[])
+activate Session
+
+Session -> Session : writes to SerialPort\n(background thread)
+
+Session -> SLM : logMessage(TX, rawCommand)
+SLM -> UI : appendLog(TX)\nvia Platform.runLater()
+
+Session -> Session : waitForData(RECEIVE_TIMEOUT)
+Session -> Session : reads response from SerialPort
+
+== Handler selection ==
+
+Session -> Registry : getHandler(command)
+activate Registry
+Registry -> Registry : queries all handlers\nfor specificity score
+Registry -> Registry : selects handler with\nlongest matching prefix
+Registry --> Session : returns bestHandler
+deactivate Registry
+
+== Response processing ==
+
+Session -> Handler : process(responseBytes, command, args)
+activate Handler
+Handler -> Handler : validates CRC\nparses payload
+Handler -> Handler : applies divider, units\nchecks limits
+Handler --> Session : CommandResult\n(formattedData, plotValue, unit)
+deactivate Handler
+
+alt plotValue is present
+    Session -> PlotMgr : addData(portId, value, unit)
+    PlotMgr -> PlotMgr : updates XYChart.Series
+end
+
+Session -> SLM : logMessage(RX, formattedData)
+SLM -> UI : appendLog(RX)\nvia Platform.runLater()
+
+Session --> Script : returns result
+deactivate Session
+
+Script -> Script : continues to next command\nor waits for interval
+
+@enduml

@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
+
+<BorderPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1200.0" style="-fx-font-family: 'Consolas'; -fx-font-size: 12px;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.terminal.controller.SeparateModeController">
+
+   <!-- ================= CENTER: TWO TERMINALS ================= -->
+   <center>
+      <SplitPane dividerPositions="0.5">
+
+         <!-- ================= LEFT TERMINAL ================= -->
+         <BorderPane style="-fx-border-color: #cccccc; -fx-border-width: 1;">
+            <top>
+               <HBox style="-fx-background-color: #e0e0e0; -fx-padding: 8;">
+                  <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="Terminal 1" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Label fx:id="firstStatusLabel" text="Disconnected" textFill="RED" />
+               </HBox>
+            </top>
+
+            <center>
+               <BorderPane>
+                  <center>
+                     <ScrollPane fx:id="firstScrollPane" BorderPane.alignment="CENTER">
+                        <TextFlow fx:id="firstTextFlow" />
+                     </ScrollPane>
+                  </center>
+               </BorderPane>
+            </center>
+
+            <right>
+               <BorderPane prefWidth="162.0" style="-fx-border-color: #cccccc; -fx-border-width: 0 0 0 1;">
+                  <center>
+                     <ScrollPane fitToWidth="true">
+                        <VBox spacing="15" style="-fx-padding: 10;">
+
+                           <!-- Connection Section -->
+                           <VBox spacing="8">
+                              <Label style="-fx-font-weight: bold;" text="Connection" />
+                              <HBox alignment="CENTER_RIGHT" spacing="10">
+                                 <Label text="Port:" />
+                                 <ComboBox fx:id="firstPortList" prefWidth="85.0" />
+                              </HBox>
+                              <HBox alignment="CENTER_RIGHT" spacing="10">
+                                 <Label text="Baud:" />
+                                 <ComboBox fx:id="firstBaudRate" prefWidth="85.0" />
+                              </HBox>
+                              <Button fx:id="firstOpen" maxWidth="Infinity" onAction="#firstOpen" text="Open" />
+                           </VBox>
+
+                           <Separator />
+
+                           <!-- Control Lines -->
+                           <VBox spacing="8">
+                              <Label style="-fx-font-weight: bold;" text="Control Lines" />
+                              <HBox spacing="15">
+                                 <RadioButton fx:id="firstRTS" onAction="#setFirstRTS" text="RTS" />
+                                 <RadioButton fx:id="firstCTS" text="CTS" />
+                              </HBox>
+                              <HBox spacing="15">
+                                 <RadioButton fx:id="firstDTR" onAction="#setFirstDTR" text="DTR" />
+                                 <RadioButton fx:id="firstDSR" text="DSR" />
+                              </HBox>
+                           </VBox>
+
+                           <Separator />
+
+                           <!-- Commands -->
+                           <VBox spacing="8">
+                              <Label style="-fx-font-weight: bold;" text="Commands" />
+                              <Button maxWidth="Infinity" onAction="#initFirstPort" text="Init Command" />
+                           </VBox>
+
+                           <Separator />
+
+                           <!-- Step Mode -->
+                           <VBox spacing="8">
+                              <Text fx:id="firstStepMode" style="-fx-font-weight: bold; -fx-fill: #333333;" text="Step Mode" />
+                              <HBox alignment="CENTER" spacing="5">
+                                 <Button fx:id="firstPreviousStepButton" onAction="#firstPreviousStep" text="◀">
+                                    <tooltip>
+                                       <Tooltip hideDelay="10ms" showDelay="10ms" text="Previous step" />
+                                    </tooltip>
+                                 </Button>
+                                 <Button fx:id="firstNextStepButton" onAction="#firstNextStep" text="▶">
+                                    <tooltip>
+                                       <Tooltip hideDelay="10ms" showDelay="10ms" text="Next step" />
+                                    </tooltip>
+                                 </Button>
+                                 <Button fx:id="firstRepeatStepButton" onAction="#firstRepeatCommand" text="🔁">
+                                    <tooltip>
+                                       <Tooltip hideDelay="10ms" showDelay="10ms" text="Repeat command" />
+                                    </tooltip>
+                                 </Button>
+                                 <Button fx:id="firstResetStepButton" onAction="#firstRestartCommand" text="↻">
+                                    <tooltip>
+                                       <Tooltip hideDelay="10ms" showDelay="10ms" text="Restart" />
+                                    </tooltip>
+                                 </Button>
+                                 <Button fx:id="firstStopStepButton" onAction="#firstStopStepMode" text="■">
+                                    <tooltip>
+                                       <Tooltip hideDelay="10ms" showDelay="10ms" text="Stop step mode" />
+                                    </tooltip>
+                                 </Button>
+                              </HBox>
+                           </VBox>
+
+                        </VBox>
+                     </ScrollPane>
+                  </center>
+               </BorderPane>
+            </right>
+
+            <bottom>
+               <VBox spacing="10" style="-fx-padding: 10; -fx-border-color: #cccccc; -fx-border-width: 1 0 0 0;">
+
+                  <TextArea fx:id="firstTextArea" prefRowCount="7" promptText="Enter command..." style="-fx-font-family: 'Consolas';" />
+
+                  <HBox alignment="CENTER_LEFT" spacing="10">
+                     <Label text="Times:" />
+                     <TextField fx:id="firstTimes" prefWidth="60" promptText="1" />
+                     <Label text="Interval (ms):" />
+                     <TextField fx:id="firstInterval" prefWidth="80" promptText="100" />
+                     <Button onAction="#firstSend" style="-fx-base: #cdddbf;" text="Send" />
+                     <Button onAction="#firstStop" style="-fx-base: #dcc0b8;" text="Stop" />
+                     <Region HBox.hgrow="ALWAYS" />
+                     <Text fx:id="firstCounterRemainingTimes" style="-fx-fill: #666666;" />
+                  </HBox>
+
+               </VBox>
+            </bottom>
+
+         </BorderPane>
+
+         <!-- ================= RIGHT TERMINAL ================= -->
+         <BorderPane style="-fx-border-color: #cccccc; -fx-border-width: 1;">
+            <top>
+               <HBox style="-fx-background-color: #e0e0e0; -fx-padding: 8;">
+                  <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="Terminal 2" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Label fx:id="secondStatusLabel" text="Disconnected" textFill="RED" />
+               </HBox>
+            </top>
+
+            <center>
+               <BorderPane>
+                  <center>
+                     <ScrollPane fx:id="secondScrollPane" BorderPane.alignment="CENTER">
+                        <TextFlow fx:id="secondTextFlow" />
+                     </ScrollPane>
+                  </center>
+               </BorderPane>
+            </center>
+
+            <right>
+               <BorderPane prefWidth="162.0" style="-fx-border-color: #cccccc; -fx-border-width: 0 0 0 1;">
+                  <center>
+                     <ScrollPane fitToWidth="true">
+                        <VBox spacing="15" style="-fx-padding: 10;">
+
+                           <!-- Connection Section -->
+                           <VBox spacing="8">
+                              <Label style="-fx-font-weight: bold;" text="Connection" />
+                              <HBox alignment="CENTER_RIGHT" spacing="10">
+                                 <Label text="Port:" />
+                                 <ComboBox fx:id="secondPortList" prefWidth="85.0" />
+                              </HBox>
+                              <HBox alignment="CENTER_RIGHT" spacing="10">
+                                 <Label text="Baud:" />
+                                 <ComboBox fx:id="secondBaudRate" prefWidth="85.0" />
+                              </HBox>
+                              <Button fx:id="secondOpen" maxWidth="Infinity" onAction="#secondOpen" text="Open" />
+                           </VBox>
+
+                           <Separator />
+
+                           <!-- Control Lines -->
+                           <VBox spacing="8">
+                              <Label style="-fx-font-weight: bold;" text="Control Lines" />
+                              <HBox spacing="15">
+                                 <RadioButton fx:id="secondRTS" onAction="#setSecondRTS" text="RTS" />
+                                 <RadioButton fx:id="secondCTS" text="CTS" />
+                              </HBox>
+                              <HBox spacing="15">
+                                 <RadioButton fx:id="secondDTR" onAction="#setSecondDTR" text="DTR" />
+                                 <RadioButton fx:id="secondDSR" text="DSR" />
+                              </HBox>
+                           </VBox>
+
+                           <Separator />
+
+                           <!-- Commands -->
+                           <VBox spacing="8">
+                              <Label style="-fx-font-weight: bold;" text="Commands" />
+                              <Button maxWidth="Infinity" onAction="#initSecondPort" text="Init Command" />
+                           </VBox>
+
+                           <Separator />
+
+                           <!-- Step Mode -->
+                           <VBox spacing="8">
+                              <Text fx:id="secondStepMode" style="-fx-font-weight: bold; -fx-fill: #333333;" text="Step Mode" />
+                              <HBox alignment="CENTER" spacing="5">
+                                 <Button fx:id="secondPreviousStepButton" onAction="#secondPreviousStep" text="◀">
+                                    <tooltip>
+                                       <Tooltip hideDelay="10ms" showDelay="10ms" text="Previous step" />
+                                    </tooltip>
+                                 </Button>
+                                 <Button fx:id="secondNextStepButton" onAction="#secondNextStep" text="▶">
+                                    <tooltip>
+                                       <Tooltip hideDelay="10ms" showDelay="10ms" text="Next step" />
+                                    </tooltip>
+                                 </Button>
+                                 <Button fx:id="secondRepeatStepButton" onAction="#secondRepeatCommand" text="🔁">
+                                    <tooltip>
+                                       <Tooltip hideDelay="10ms" showDelay="10ms" text="Repeat command" />
+                                    </tooltip>
+                                 </Button>
+                                 <Button fx:id="secondResetStepButton" onAction="#secondRestartCommand" text="↻">
+                                    <tooltip>
+                                       <Tooltip hideDelay="10ms" showDelay="10ms" text="Restart" />
+                                    </tooltip>
+                                 </Button>
+                                 <Button fx:id="secondStopStepButton" onAction="#secondStopStepMode" text="■">
+                                    <tooltip>
+                                       <Tooltip hideDelay="10ms" showDelay="10ms" text="Stop step mode" />
+                                    </tooltip>
+                                 </Button>
+                              </HBox>
+                           </VBox>
+
+                        </VBox>
+                     </ScrollPane>
+                  </center>
+               </BorderPane>
+            </right>
+
+            <bottom>
+               <VBox spacing="10" style="-fx-padding: 10; -fx-border-color: #cccccc; -fx-border-width: 1 0 0 0;">
+
+                  <TextArea fx:id="secondTextArea" prefRowCount="7" promptText="Enter command..." style="-fx-font-family: 'Consolas';" />
+
+                  <HBox alignment="CENTER_LEFT" spacing="10">
+                     <Label text="Times:" />
+                     <TextField fx:id="secondTimes" prefWidth="60" promptText="1" />
+                     <Label text="Interval (ms):" />
+                     <TextField fx:id="secondInterval" prefWidth="80" promptText="100" />
+                     <Button onAction="#secondSend" style="-fx-base: #cdddbf;" text="Send" />
+                     <Button onAction="#secondStop" style="-fx-base: #dcc0b8;" text="Stop" />
+                     <Region HBox.hgrow="ALWAYS" />
+                     <Text fx:id="secondCounterRemainingTimes" style="-fx-fill: #666666;" />
+                  </HBox>
+
+               </VBox>
+            </bottom>
+
+         </BorderPane>
+
+      </SplitPane>
+   </center>
+
+</BorderPane>

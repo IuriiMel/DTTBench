@@ -1,0 +1,198 @@
+@startuml sequence
+!theme plain
+title DTTBench - Command Execution Flow
+
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam shadowing false
+
+actor User
+participant "UI Controller" as UI
+participant "ScriptEngine" as SE
+participant "PortManager" as PM
+participant "PortSession" as PS
+participant "SessionListenerManager" as SLM
+participant "HandlerRegistry" as HR
+participant "CommandHandler" as CH
+participant "EnumCommandMatcher" as ECM
+participant "PlotterManager" as PoM
+participant "Plotter" as Po
+
+== 1. User initiates command ==
+
+User -> UI : Click "Send" / Run script
+activate UI
+
+UI -> SE : execute(commands, times, interval, portID)
+activate SE
+
+== 2. Script processing loop ==
+
+loop for each command in script
+    SE -> SE : parseArguments(command)
+    SE -> SE : extract DSL commands (-open, -close, etc.)
+
+    alt DSL command: -open
+        SE -> PM : findAndOpen(portID, portName, baudRate)
+        activate PM
+        PM -> PM : validate port exists
+        PM -> PM : find/create session
+        PM -> PS : open(portName, baudRate)
+        activate PS
+        PS -> PS : serialPort.openPort()
+        PS -> PS : setupSignalListener()
+        PS -> SLM : logMessage(SYSTEM, "port opened")
+        activate SLM
+        SLM -> UI : appendLog(portID, message, SYSTEM, time)
+        activate UI
+        UI -> UI : display in TextFlow
+        UI --> SLM
+        deactivate UI
+        SLM --> PS
+        deactivate SLM
+        PS --> PM : success
+        deactivate PS
+        PM --> SE : PortSession
+        deactivate PM
+
+    else DSL command: -close
+        SE -> PM : findAndClose(portName)
+        activate PM
+        PM -> PS : close()
+        activate PS
+        PS -> PS : serialPort.closePort()
+        PS -> SLM : logMessage(SYSTEM, "port closed")
+        activate SLM
+        SLM -> UI : appendLog(portID, message, SYSTEM, time)
+        activate UI
+        UI -> UI : display in TextFlow
+        UI --> SLM
+        deactivate UI
+        SLM --> PS
+        deactivate PS
+        PS --> PM : success
+        deactivate PS
+        PM --> SE : closed
+        deactivate PM
+
+    else Regular command
+        SE -> PM : getSession(portID)
+        activate PM
+        PM --> SE : PortSession
+        deactivate PM
+
+        SE -> PS : send(commandBytes)
+        activate PS
+        PS -> PS : serialPort.writeBytes()
+        PS -> SLM : logMessage(TX)
+        activate SLM
+        SLM -> UI : appendLog(portID, message, TX, time)
+        activate UI
+        UI -> UI : display in TextFlow
+        UI --> SLM
+        deactivate UI
+        SLM --> PS
+        deactivate SLM
+        PS --> SE : sent
+        deactivate PS
+
+        == 3. Wait for response ==
+
+        SE -> SE : Thread.sleep(responseDelay)
+
+        SE -> PS : receive()
+        activate PS
+        PS -> PS : waitForData(timeout)
+        PS -> PS : serialPort.readBytes()
+        PS --> SE : rawBytes
+        deactivate PS
+
+
+
+        == 4. Parse response ==
+
+        SE -> HR : getHandler(command)
+        activate HR
+
+        loop for each registered handler
+            HR -> CH : specificity(command)
+            activate CH
+            CH -> ECM : specificity(command)
+            activate ECM
+            ECM -> ECM : findCommand(command)
+            ECM -> ECM : matches(normalizedInput, prefix)
+            ECM --> CH : specificity score
+            deactivate ECM
+            CH --> HR : score
+            deactivate CH
+        end
+
+        HR -> HR : select handler with highest score
+        HR --> SE : bestHandler
+        deactivate HR
+
+        SE -> CH : process(rawBytes, command, args)
+        activate CH
+        CH -> CH : parse binary protocol
+        CH -> CH : apply divider, units, limits...
+        CH -> CH : check ERROR/WARNING thresholds
+        CH --> SE : CommandResult
+        deactivate CH
+
+        == 5. Display results ==
+
+        SE -> SLM : logMessage(formattedData)
+        activate SLM
+        SLM -> UI : appendLog(portID, formattedData, RX, time)
+        activate UI
+        UI -> UI : display in TextFlow
+        UI --> SLM
+        deactivate UI
+        SLM --> SE
+        deactivate SLM
+
+        alt has plotValue
+            SE -> PoM : addData(portID, seriesName, value, unit)
+            activate PoM
+            PoM -> Po : addData(timestamp, value)
+            activate Po
+            Po -> Po : update chart series
+            Po -> Po : refreshChart()
+            Po --> PoM
+            deactivate Po
+            PoM --> SE
+            deactivate PoM
+        end
+
+        SE -> SLM : counterUpdate(remainingTimes)
+        activate SLM
+        SLM -> UI : updateCounter(portID, remaining)
+        activate UI
+        UI -> UI : update counter label
+        UI --> SLM
+        deactivate UI
+        SLM --> SE
+        deactivate SLM
+    end
+end
+
+SE --> UI : execution complete
+deactivate SE
+
+UI -> UI : update UI state
+UI --> User : command finished
+deactivate UI
+
+== 6. Hardware signal events (asynchronous) ==
+
+PS -> SLM : getControlSignal(CTS/DSR state)
+activate SLM
+SLM -> UI : readControlSignal(portID, signal, state)
+activate UI
+UI -> UI : update RadioButton state
+UI --> SLM
+deactivate UI
+SLM --> PS
+deactivate SLM
+
+@enduml

@@ -1,0 +1,38 @@
+DTTBench - Third-Party Software Notices
+==============================================================================
+
+DTTBench includes the following third-party software components.
+Each component is distributed under the applicable license(s)
+identified below. Where a component is offered under multiple
+licensing options, the selected license is specified in the
+"License Selection for Multi-Licensed Dependencies" section.
+
+The following list was generated from the Maven project dependencies.
+
+Lists of 11 third-party dependencies.
+     (Apache License, Version 2.0) PNGJ (ar.com.hjg:pngj:2.1.0 - http://pngj.googlecode.com/)
+     (EPL-2.0) (LGPL-2.1-only) Logback Classic Module (ch.qos.logback:logback-classic:1.6.3 - http://logback.qos.ch/logback-classic)
+     (EPL-2.0) (LGPL-2.1-only) Logback Core Module (ch.qos.logback:logback-core:1.6.3 - http://logback.qos.ch/logback-core)
+     (Apache Software License, Version 2.0) (GNU Lesser GPL, Version 3) jSerialComm (com.fazecast:jSerialComm:2.11.4 - http://fazecast.github.io/jSerialComm/)
+     (Apache-2.0) Gson (com.google.code.gson:gson:2.13.2 - https://github.com/google/gson)
+     (Apache License, Version 2.0) error-prone annotations (com.google.errorprone:error_prone_annotations:2.41.0 - https://errorprone.info/error_prone_annotations)
+     (GPLv2+CE) javafx-base (org.openjfx:javafx-base:21.0.2 - https://openjdk.java.net/projects/openjfx/javafx-base/)
+     (GPLv2+CE) javafx-controls (org.openjfx:javafx-controls:21.0.2 - https://openjdk.java.net/projects/openjfx/javafx-controls/)
+     (GPLv2+CE) javafx-fxml (org.openjfx:javafx-fxml:21.0.2 - https://openjdk.java.net/projects/openjfx/javafx-fxml/)
+     (GPLv2+CE) javafx-graphics (org.openjfx:javafx-graphics:21.0.2 - https://openjdk.java.net/projects/openjfx/javafx-graphics/)
+     (MIT) SLF4J API Module (org.slf4j:slf4j-api:2.0.18 - http://www.slf4j.org)
+
+
+Full license texts are included in the licenses/ directory.
+
+==============================================================================
+License Selection for Multi-Licensed Dependencies
+
+For dependencies that are offered by their respective copyright
+holders under multiple licensing options, DTTBench elects to use
+the license option specified below:
+
+- jSerialComm: Apache License, Version 2.0
+- Logback Classic Module: Eclipse Public License, Version 2.0
+- Logback Core Module: Eclipse Public License, Version 2.0
+

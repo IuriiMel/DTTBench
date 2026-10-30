@@ -1,0 +1,71 @@
+-c DEMONSTRATION SCRIPT ONLY
+-c Illustrates DTTBench scripting features; not executable as provided
+
+-open 18
+-open 19
+-c Initializing
+COM19: Send(DEMO_INITIALIZATION_COMMAND)
+
+-space
+-c CAP CHECKING
+COM19: Send(DEMO_CAP_CHECK_COMMAND)
+Sleep(2000)
+-c Connect VBAT + CAP
+COM19: Send(DEMO_CONNECT_VBAT_CAP_COMMAND)
+Sleep(500)
+-c Charging CAP
+COM19: Send(DEMO_CHARGE_CAP_COMMAND)
+Sleep(100)
+-c Measuring CAP charge current
+COM18: Send(DEMO_CAP_MEASURE_COMMAND -d 220 -u mA -c CAP_charge -l [35-45])
+
+-space
+-c CHECKING THE INTEGRITY OF INPUT KEYS
+COM19: Send(DEMO_INPUT_KEYS_CHECK_COMMAND)
+Sleep(100)
+COM18: Send(DEMO_BUS_MEASURE_COMMAND -d 40 -u uA -c BUS_Leakage_Current -l [0-2])
+
+-space
+-c VOLTAGE LINES CHECKING
+COM19: Send(DEMO_VOLTAGE_LINES_CHECK_COMMAND)
+Sleep(100)
+COM18: Send(DEMO_PG_MEASURE_COMMAND -d 0.5 -u mV -c PG_Meter -l [5000-6000])
+COM18: Send(DEMO_VI_MEASURE_COMMAND -d 0.33 -u mV -c VI_Meter -lw [4000-5000])
+COM18: Send(DEMO_VDD_MEASURE_COMMAND -d 0.5 -u mV -c VDD_Meter -l [4000-5000])
+-c Current measurement
+COM19: Send(DEMO_BOARD_CONSUMPTION_COMMAND)
+Sleep(1000)
+COM18: Send(DEMO_CONSUMPTION_MEASURE_COMMAND -d 10 -u mA -c Board_Consumption -l [0-20])
+
+-space
+-c MOTOR DRIVER CHECKING
+COM19: Send(DEMO_VOLTAGE_MEASUREMENT_COMMAND)
+Sleep(100)
+-c Forward mode
+COM18: RTS(1)
+COM18: Send(DEMO_CH1_MEASURE_COMMAND -d 0.5 -u mV -c CH1 -l [4000-4500])
+COM18: Send(DEMO_CH2_MEASURE_COMMAND -d 0.5 -u mV -c CH2 -l [0-10])
+-c Reverse mode
+COM18: RTS(0)
+COM18: DTR(1)
+COM18: Send(DEMO_CH1_MEASURE_COMMAND -d 0.5 -u mV -c CH1 -l [0-10])
+COM18: Send(DEMO_CH2_MEASURE_COMMAND -d 0.5 -u mV -c CH2 -l [4000-4500])
+-c Coast mode
+COM18: DTR(0)
+COM18: Send(DEMO_CH1_MEASURE_COMMAND -d 0.5 -u mV -c CH1 -l [0-10])
+COM18: Send(DEMO_CH2_MEASURE_COMMAND -d 0.5 -u mV -c CH2 -l [0-10])
+Sleep(100)
+
+-space
+-c CONNECTION CHECKING
+COM19: Send(DEMO_CONNECTION_CHECK_COMMAND)
+Sleep(100)
+-close 18
+Sleep(100)
+-run DEMO_TOOL
+Sleep(2000)
+-stop DEMO_TOOL
+Sleep(100)
+
+COM19: Send(DEMO_SHUTDOWN_COMMAND)
+-close 19

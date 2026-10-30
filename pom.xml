@@ -1,0 +1,219 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.terminal</groupId>
+    <artifactId>DTTBench</artifactId>
+    <version>1.0</version>
+    <packaging>jar</packaging>
+
+    <name>DTTBench</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <mainClass>com.terminal.Main</mainClass>
+        <javafx.version>21.0.9</javafx.version>
+    </properties>
+
+    <dependencies>
+        <!--JavaFX for GluonFX building. For shade package comment it -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+
+        <!--Gson-->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.13.2</version>
+        </dependency>
+
+        <!--jSerial-->
+        <dependency>
+            <groupId>com.fazecast</groupId>
+            <artifactId>jSerialComm</artifactId>
+            <version>2.11.4</version>
+        </dependency>
+
+        <!--logger-->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.6.3</version>
+        </dependency>
+
+        <!--PNG writer-->
+        <dependency>
+            <groupId>ar.com.hjg</groupId>
+            <artifactId>pngj</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <!--New source directory-->
+        <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <excludes>
+                    <exclude>**/*.dll</exclude>
+                </excludes>
+            </resource>
+        </resources>
+
+        <plugins>
+            <!--For building native image with GraalVM through GluonFX-->
+            <plugin>
+                <groupId>com.gluonhq</groupId>
+                <artifactId>gluonfx-maven-plugin</artifactId>
+                <version>1.0.28</version>
+                <configuration>
+                    <mainClass>${mainClass}</mainClass>
+                    <nativeImageArgs>
+                        <arg>-H:+ReportExceptionStackTraces</arg>
+                        <arg>--no-fallback</arg>
+                        <arg>-O3</arg>
+                        <arg>-march=compatibility</arg>     <!--For all old CPU (oldest then i7)-->
+                    </nativeImageArgs>
+                    <resourcesList>
+                        <resource>.*\\.dll$</resource>
+                        <list>build-info.properties</list>
+                    </resourcesList>
+                    <reflectionList>
+                        <list>com.terminal.controller.MainController</list>
+                        <list>com.terminal.controller.SeparateModeController</list>
+                        <list>com.terminal.controller.CoordinatedModeController</list>
+                        <list>com.terminal.controller.CommandListController</list>
+                        <list>com.terminal.utils.FileUtils</list>
+                        <list>com.terminal.model.Command</list>
+                        <list>com.terminal.plotter.PlotterManager</list>
+                        <list>com.terminal.plotter.Plotter</list>
+                        <list>javafx.geometry.Insets</list>
+                        <list>javafx.scene.control.MenuBar</list>
+                        <list>javafx.scene.control.Menu</list>
+                        <list>javafx.scene.control.MenuItem</list>
+                        <list>javafx.scene.control.TableView</list>
+                        <list>javafx.scene.control.Button</list>
+                        <list>javafx.scene.control.RadioButton</list>
+                        <list>javafx.scene.control.ToggleButton</list>
+                        <list>javafx.scene.control.Tab</list>
+                        <list>javafx.scene.control.TableColumn</list>
+                        <list>javafx.scene.control.ComboBox</list>
+                        <list>javafx.scene.control.SplitPane</list>
+                        <list>javafx.scene.control.ScrollPane</list>
+                        <list>javafx.scene.control.TitledPane</list>
+                        <list>javafx.scene.control.Tooltip</list>
+                        <list>javafx.scene.control.TextField</list>
+                        <list>javafx.scene.control.TextArea</list>
+                        <list>javafx.scene.control.Label</list>
+                        <list>javafx.scene.text.Text</list>
+                        <list>javafx.scene.text.Font</list>
+                        <list>javafx.scene.text.TextFlow</list>
+                        <list>javafx.util.Duration</list>
+                        <list>javafx.beans.property.BooleanProperty</list>
+                        <list>javafx.beans.property.SimpleBooleanProperty</list>
+                        <list>ch.qos.logback.classic.util.DefaultJoranConfigurator</list>
+                        <list>ch.qos.logback.classic.BasicConfigurator</list>
+                        <list>ch.qos.logback.core.ConsoleAppender</list>
+                        <list>ch.qos.logback.core.rolling.RollingFileAppender</list>
+                        <list>ch.qos.logback.core.rolling.TimeBasedRollingPolicy</list>
+                        <list>ch.qos.logback.classic.encoder.PatternLayoutEncoder</list>
+                    </reflectionList>
+                    <jniList>
+                        <list>com.fazecast.jSerialComm.SerialPort</list>
+                    </jniList>
+
+                </configuration>
+            </plugin>
+            <!--For fat-jar, launching from cmd with -module-path "javafx-sdk-x.x.x" -add-modules fxml,controls-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.source}</target>
+                </configuration>
+            </plugin>
+            <!--For information in About dialog-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.5.0</version>
+                <configuration>
+                    <delimiters>
+                        <delimiter>@</delimiter>
+                    </delimiters>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals><goal>shade</goal></goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>${mainClass}</mainClass>
+                                </transformer>
+                            </transformers>
+                            <filters>
+                                <filter>
+                                    <artifact>org.openjfx:*</artifact>
+                                    <excludes>
+                                        <exclude>**/*</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--Generate license information and THIRD-PARTY-NOTICES.txt for dependencies-->
+            <!--<plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>2.7.1</version>
+                <configuration>
+                    <thirdPartyFilename>THIRD-PARTY-NOTICES.txt</thirdPartyFilename>
+                    <encoding>UTF-8</encoding>
+                    <outputDirectory>${project.build.directory}/generated-resources/license</outputDirectory>
+                    <licenseMerges>
+                        <licenseMerge>Apache License, Version 2.0|The Apache Software License, Version 2.0|Apache 2.0</licenseMerge>
+                        <licenseMerge>MIT License|The MIT License</licenseMerge>
+                    </licenseMerges>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>download-licenses</id>
+                        <goals>
+                            <goal>download-licenses</goal>
+                            <goal>add-third-party</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+            </plugin>-->
+        </plugins>
+    </build>
+</project>

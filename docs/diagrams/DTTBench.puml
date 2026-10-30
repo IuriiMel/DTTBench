@@ -1,0 +1,872 @@
+@startuml
+class com.terminal.Main {
+- {static} Stage pStage
+- {static} Image ico
+- {static} String launchTime
+- {static} Logger log
++ {static} void main(String[])
++ void start(Stage)
++ {static} void setOnCenter(Stage)
++ {static} Image getIco()
++ {static} String getLaunchTime()
+}
+
+
+class com.terminal.ui.NewWindow {
+- Stage stage
+- FXMLLoader loader
+- Parent rootLayout
+- MainController mainController
++ Stage getStage()
++ FXMLLoader getLoader()
++ Parent getRootLayout()
++ MainController getMainController()
+}
+
+
+class com.terminal.controller.tabs.VoltageTab {
+- TextField channelField
+- TextField measureTimeField
++ String getTabName()
++ Node getContent()
++ String generateCommand()
++ String generateDescription()
++ void clear()
+}
+
+
+class com.terminal.controller.SeparateModeController {
+- Label firstStatusLabel
+- Label secondStatusLabel
+- Button firstPreviousStepButton
+- Button firstNextStepButton
+- Button firstRepeatStepButton
+- Button firstResetStepButton
+- Button firstStopStepButton
+- Button secondPreviousStepButton
+- Button secondNextStepButton
+- Button secondRepeatStepButton
+- Button secondResetStepButton
+- Button secondStopStepButton
+- RadioButton firstRTS
+- RadioButton firstCTS
+- RadioButton firstDTR
+- RadioButton firstDSR
+- RadioButton secondRTS
+- RadioButton secondCTS
+- RadioButton secondDTR
+- RadioButton secondDSR
+- TextFlow firstTextFlow
+- ComboBox<String> firstPortList
+- ComboBox<String> firstBaudRate
+- Button firstOpen
+- TextArea firstTextArea
+- TextField firstTimes
+- Text firstCounterRemainingTimes
+- TextField firstInterval
+- ScrollPane firstScrollPane
+- TextFlow secondTextFlow
+- ComboBox<String> secondPortList
+- ComboBox<String> secondBaudRate
+- Button secondOpen
+- TextArea secondTextArea
+- TextField secondTimes
+- Text secondCounterRemainingTimes
+- TextField secondInterval
+- ScrollPane secondScrollPane
+- Text firstStepMode
+- Text secondStepMode
+- PortManager portManager
+- PlotterManager plotterManager
+- {static} DateTimeFormatter FORMATTER
+- HandlerRegistry registry
+- ScriptEngine firstScriptEngine
+- ScriptEngine secondScriptEngine
+- ObservableList<String> portNames
+- ObservableList<String> baudRates
+- List<String> initCommand
+- boolean firstTextAreaClicked
+- boolean secondTextAreaClicked
+- int firstCommandIndex
+- int secondCommandIndex
+- BooleanProperty firstIsSendBusy
+- BooleanProperty secondIsSendBusy
++ void initialize()
++ void init()
+- void getComPorts()
+- void fillPortList(ComboBox<String>)
+- void fillBaudRate()
++ void mouseEvent(ComboBox<String>)
++ void firstOpen()
++ void secondOpen()
+- void openPort(PortID,Button,ComboBox<String>,ComboBox<String>)
++ void initFirstPort()
++ void initSecondPort()
++ void initPort(PortID,ScriptEngine)
++ void firstSend()
++ void secondSend()
+- void send(PortID,ScriptEngine,TextArea,TextField,TextField)
++ void firstNextStep()
++ void secondNextStep()
+- int nextStep(PortID,ScriptEngine,TextArea,Text,int)
++ void firstPreviousStep()
++ void secondPreviousStep()
+- int previousStep(PortID,ScriptEngine,TextArea,int)
++ void firstRepeatCommand()
++ void secondRepeatCommand()
++ void repeatCommand(PortID,ScriptEngine,List<String>,int)
++ void firstRestartCommand()
++ void secondRestartCommand()
++ void firstStopStepMode()
++ void secondStopStepMode()
++ void stopStepMode(PortID)
++ void setFirstRTS()
++ void setFirstDTR()
++ void setSecondRTS()
++ void setSecondDTR()
++ List<String> getCommandsList(TextArea)
++ void firstStop()
++ void secondStop()
++ BooleanProperty getFirstIsSendBusy()
++ BooleanProperty getSecondIsSendBusy()
++ void setPortManager(PortManager)
++ void setPlotterManager(PlotterManager)
++ boolean isSeparateMode(PortID)
++ void updateStatusLabel(Labeled,boolean)
++ void highlightCommand(TextArea,List<String>,int)
++ TextArea selectedTextArea()
++ void insertCommandIntoCaret(String)
++ void updatePortState(PortID,boolean)
++ void appendLog(PortID,String,LogType,LocalDateTime)
++ void writeControlSignal(PortID,String,boolean)
++ void readControlSignal(PortID,ControlSignal,boolean)
++ void appendUtilLog(PortID,String,LogType,LocalDateTime)
++ void updateCounter(PortID,int)
++ void updateBusyState(PortID,boolean)
+}
+
+
+class com.terminal.plot.Plotter {
+- Map<String,List<Long>> timestampsMap
+- Map<String,List<Double>> valuesMap
+- Map<String,XYChart.Series<Number,Number>> seriesMap
+- Map<XYChart.Data<Number,Number>,Tooltip> tooltipMap
+- Map<String,String> unitsMap
+- {static} Logger log
+- {static} int MAX_POINTS_PER_SERIES
+- String title
+- TimeMode timeMode
+- {static} String ICON_PATH
+- Stage stage
+- LineChart<Number,Number> chart
+- NumberAxis xAxis
+- NumberAxis yAxis
+- Label statusLabel
+- ToggleButton modeButton
+- double xLowerBound
+- double yLowerBound
+- boolean isDragging
+- double dragStartX
+- double dragStartXLower
+- double dragStartYLower
+- Rectangle rubberBand
+- double rubberBandStartX
+- double rubberBandStartY
+- Pane plotArea
+- long dayStartMs
+- double currentXTickUnit
+- boolean isAutoScaling
+- StringConverter<Number> absoluteTimeFormatter
++ void addData(String,double,String)
++ void addData(double)
++ void addData(String,double)
+- void addData(String,long,double)
++ void clear()
++ void setTimeMode(TimeMode)
++ void setTitle(String)
++ void plotGraph()
+- void show()
+- ToolBar buildToolbar()
+- void buildChart()
+- void refreshChart()
+- void attachTooltips(SimpleDateFormat)
+- void applyBounds()
+- double calculateTickUnit(double,boolean)
+- {static} String formatDouble(double)
+- String formatRelativeTime(double,double)
+- void zoom(double,double)
+- void zoom(double,double,double,double)
+- void resetZoom()
+- void exportPng()
+- void exportCsv()
+}
+
+
+enum com.terminal.plot.TimeMode {
++  ABSOLUTE
++  RELATIVE
+}
+
+class com.terminal.handlers.CommandResult {
+- String formattedData
+- Double plotValue
+- String plotUnit
+- String comment
+- LogType type
++ String getFormattedData()
++ void setFormattedData(String)
++ Double getPlotValue()
++ void setPlotValue(Double)
++ String getPlotUnit()
++ void setPlotUnit(String)
++ String getComment()
++ void setComment(String)
++ LogType getType()
++ void setType(LogType)
+}
+
+
+class com.terminal.controller.MainController {
+- ComboBox<ViewMode> mode
+- NewWindow commandList
+- ViewModeManager controllerManager
+- BorderPane pane
+- {static} Logger log
++ void initialize()
++ void setPane(BorderPane)
++ void setControllerManager(ViewModeManager)
++ void modeListener()
++ void commandList()
++ void config()
++ void syntax()
++ void about()
+}
+
+
+class com.terminal.handlers.HandlerRegistry {
+- List<CommandHandler> handlers
++ CommandHandler getHandler(String)
+}
+
+
+class com.terminal.plot.PlotterManager {
+- {static} Map<PortID,Plotter> plotters
++ {static} void plot(PortID)
++ {static} void addData(PortID,String,double,String)
++ {static} void clear(PortID)
+}
+
+
+class com.terminal.controller.CommandListController {
+- TableView<Command> commandsTable
+- TableColumn<Command,String> descriptionColumn
+- TableColumn<Command,String> commandsColumn
+- TabPane tabPane
+- ViewModeManager controllerManager
+- ObservableList<Command> commandList
+- BaseTabContent activeTabContent
+- {static} String FILE_NAME
+- Gson gson
+- {static} Logger log
++ void initialize()
++ void setControllerManager(ViewModeManager)
+- void registerTab(CommandTab)
+- void add()
+- void save()
+- void addCommand()
+- void deleteCommand()
+- void loadDefaultCommands()
+- void saveCommands()
+- void loadCommands()
++ void clear()
+}
+
+
+class com.terminal.model.Command {
+- String description
+- String command
+- StringProperty descriptionProperty
+- StringProperty commandProperty
++ String getDescription()
++ String getCommand()
++ StringProperty getDescriptionProperty()
++ StringProperty getCommandProperty()
++ void initProperties()
+}
+
+
+class com.terminal.ui.NewScene {
+- FXMLLoader loader
+- Parent rootLayout
++ FXMLLoader getLoader()
++ Parent getRootLayout()
+}
+
+
+class com.terminal.port.PortManager {
+- Map<PortID,PortSession> sessions
+- SessionListener globalListener
++ Map<PortID,PortSession> getSessions()
++ PortSession getSession(PortID)
++ boolean removeSession(PortID)
++ SessionListener getSessionListener()
++ List<String> getComPorts()
++ PortSession findAndOpen(PortID,String,int)
++ boolean findAndClose(String)
++ void closeAll()
+}
+
+
+class com.terminal.utils.UtilsRunner {
+- {static} Map<Path,RunningUtils> runningUtils
+- {static} String[] EXTENSIONS
+- {static} Logger log
++ {static} boolean run(String)
++ {static} boolean stop(String)
+- {static} Path resolveUtilityPath(String)
+}
+
+
+class com.terminal.utils.UtilsRunner$RunningUtils {
+~ ProcessHandle process
+~ String name
+~ String extension
++ ProcessHandle getProcess()
++ String getName()
++ String getExtension()
+}
+
+
+interface com.terminal.handlers.CommandDefinition {
+~ String getPrefix()
+~ boolean expectsResponse()
+~ int getSpecificity()
+}
+
+class com.terminal.config.BuildInfo {
+- {static} Properties props
+- {static} Logger log
++ {static} String getVersion()
++ {static} String getBuildTime()
++ {static} String getAppName()
+}
+
+
+interface com.terminal.controller.tabs.CommandTab {
+~ String getTabName()
+~ Node getContent()
+~ String generateCommand()
+~ String generateDescription()
+~ void clear()
+}
+
+class com.terminal.handlers.devices.SC18IMHandler {
+- EnumCommandMatcher<Command> matcher
++ boolean supports(String)
++ int getResponseDelayMs()
++ int specificity(String)
++ boolean expectsResponse(String)
++ CommandResult process(byte[],String,Map<String,String>)
+}
+
+
+enum com.terminal.handlers.devices.Command {
++  I2C_START
++  I2C_STOP
++  READ_REGISTER
++  WRITE_REGISTER
++  READ_GPIO
++  WRITE_GPIO
++  POWER_DOWN
+- String prefix
+- boolean expectsResponse
+- int specificity
++ String getPrefix()
++ boolean expectsResponse()
++ int getSpecificity()
+}
+
+
+class com.terminal.script.ScriptEngine {
+- PortManager portManager
+- SessionListener listener
+- HandlerRegistry registry
+- DateTimeFormatter FORMATTER
+- {static} Logger log
+- String nameRTS
+- String nameDTR
+- Thread executionThread
+- AtomicBoolean isRunning
++ void execute(List<String>,int,int,PortID)
++ void executeStep(String,PortID)
++ void stop()
+- void executeBlock(List<String>,PortID)
+- void processCommand(String,PortID)
+- void sendCommand(String,PortID,String,Map<String,String>)
+- void setSignal(String,PortID,String)
+- void manageUtil(PortID,String,boolean,LocalDateTime)
+- PortID findPortID(String)
+- Map<String,String> parseArguments(String)
+}
+
+
+class com.terminal.model.About {
+- {static} DateTimeFormatter BUILD_TIME_FORMAT
++ {static} void showAboutDialog()
++ {static} String formatBuildTime(String)
+}
+
+
+class com.terminal.utils.ByteUtils {
+- {static} HexFormat HEX
++ {static} byte[] hexToBytes(String)
++ {static} String bytesToHex(byte[])
++ {static} String bytesToAscii(byte[])
++ {static} byte[] asciiToBytes(String)
++ {static} byte[] crc16(byte[],CRC16Mode)
+}
+
+
+enum com.terminal.utils.CRC16Mode {
++  ARC
++  IBM_SDLC
+- int polynomial
+- int initialValue
+- boolean refIn
+- boolean refOut
+- int xorOut
++ int getPolynomial()
++ int getInitialValue()
++ boolean isRefIn()
++ boolean isRefOut()
++ int getXorOut()
+}
+
+
+class com.terminal.controller.tabs.BaseTabContent {
+- TextField commandField
+- TextField descriptionField
+- CommandTab tab
++ String getCommand()
++ String getDescription()
++ void clear()
+}
+
+
+class com.terminal.port.SessionListenerManager {
+- ActiveControllerProvider provider
++ void portStateChanged(PortID,boolean)
++ void logMessage(PortID,String,LogType,LocalDateTime)
++ void setControlSignal(PortID,String,boolean)
++ void getControlSignal(PortID,ControlSignal,boolean)
++ void utilEvent(PortID,String,LogType,LocalDateTime)
++ void counterUpdate(PortID,int)
++ void scriptStateChanged(PortID,boolean)
+}
+
+
+interface com.terminal.port.SessionListenerManager$ActiveControllerProvider {
+~ ModeController getActiveController()
+}
+
+class com.terminal.controller.ViewModeManager {
+- Map<ViewMode,ModeController> controllers
+- Map<ViewMode,Node> contents
+- ModeController activeController
++ void addController(ViewMode,ModeController)
++ void addContent(ViewMode,Node)
++ void setActiveController(ViewMode)
++ Node getContent(ViewMode)
++ ModeController getActiveController()
+}
+
+
+class com.terminal.controller.tabs.FrequencyTab {
+- ComboBox<FrequencyMode> modeBox
+- ComboBox<FrequencyChannel> channelBox
+- TextField measureTimeField
++ String getTabName()
++ Node getContent()
++ String generateCommand()
++ String generateDescription()
++ void clear()
+}
+
+
+enum com.terminal.controller.tabs.FrequencyMode {
++  MODE_1
++  MODE_2
++  MODE_3
+- String label
+- String command
++ String getLabel()
++ String getCommand()
++ String toString()
+}
+
+
+enum com.terminal.controller.tabs.FrequencyChannel {
++  CHANNEL1
++  CHANNEL2
++  CHANNEL3
+- String command
++ String getCommand()
++ String toString()
+}
+
+
+class com.terminal.controller.tabs.RelayTab {
+- ToggleButton[] relays
++ String getTabName()
++ Node getContent()
++ String generateCommand()
++ String generateDescription()
++ void clear()
+}
+
+
+class com.terminal.handlers.EnumCommandMatcher {
+- Command[] commands
++ boolean supports(String)
++ int specificity(String)
++ boolean expectsResponse(String)
++ Command findCommand(String)
++ {static} boolean matches(String,String)
+- {static} String normalize(String)
+}
+
+
+class com.terminal.utils.FileUtils {
+- {static} Path defaultScriptDirection
+- {static} Path defaultLogDirection
+- {static} Logger log
++ {static} ContextMenu contextMenu(TextFlow)
++ {static} void contextMenu(TextArea)
++ {static} void saveToFile(TextFlow)
++ {static} void saveToFile(TextArea)
++ {static} void saveErrors(TextFlow)
++ {static} void copy(TextFlow)
++ {static} void loadFromFile(TextArea)
+- {static} File chooseFile(String,Path)
++ {static} void findReplace(TextArea)
+}
+
+
+class com.terminal.controller.FindReplace {
+- TextArea textArea
+- TextField findField
+- TextField replaceField
+- int lastIndex
++ void findNext()
++ void replaceNext()
++ void replaceAll()
+}
+
+
+interface com.terminal.port.SessionListener {
+~ void portStateChanged(PortID,boolean)
+~ void logMessage(PortID,String,LogType,LocalDateTime)
+~ void setControlSignal(PortID,String,boolean)
+~ void getControlSignal(PortID,ControlSignal,boolean)
+~ void utilEvent(PortID,String,LogType,LocalDateTime)
+~ void counterUpdate(PortID,int)
+~ void scriptStateChanged(PortID,boolean)
+}
+
+enum com.terminal.port.LogType {
++  TX
++  RX
++  INFO
++  WARNING
++  ERROR
++  SYSTEM
++  PORT_OPENED
++  PORT_CLOSED
++  UTIL_STARTED
++  UTIL_STOPPING
++  BLOCK_END
+- {static} Color color
++ Color getColor()
+}
+
+
+enum com.terminal.port.ControlSignal {
++  RTS
++  CTS
++  DTR
++  DSR
+}
+
+interface com.terminal.controller.ModeController {
+~ void insertCommandIntoCaret(String)
+~ void updatePortState(PortID,boolean)
+~ void appendLog(PortID,String,LogType,LocalDateTime)
+~ void writeControlSignal(PortID,String,boolean)
+~ void readControlSignal(PortID,ControlSignal,boolean)
+~ void appendUtilLog(PortID,String,LogType,LocalDateTime)
+~ void updateCounter(PortID,int)
+~ void updateBusyState(PortID,boolean)
+}
+
+enum com.terminal.port.PortID {
++  SEPARATE_1
++  SEPARATE_2
++  COORDINATED_1
++  COORDINATED_2
++  ADDITIONAL_1
++  ADDITIONAL_2
++  ADDITIONAL_3
++  ADDITIONAL_4
++  ADDITIONAL_5
++  ADDITIONAL_6
++  ADDITIONAL_7
++  ADDITIONAL_8
++  ADDITIONAL_9
++  ADDITIONAL_10
++ {static} int ADDITIONAL_PORTS_COUNT
++ {static} int MAIN_PORTS_COUNT
+- {static} int countAdditionalPorts()
+}
+
+
+class com.terminal.handlers.DefaultCommandHandler {
+- {static} int HEADER_LENGTH
+- {static} int BODY_SIZE
+- {static} int CRC_LENGTH
++ boolean supports(String)
++ int getResponseDelayMs()
++ boolean expectsResponse(String)
++ CommandResult process(byte[],String,Map<String,String>)
+}
+
+
+enum com.terminal.handlers.CommandType {
++  INFORMATION
++  VOLTAGE
++  UNKNOWN
+- List<String> codes
+- String units
++ {static} CommandType fromCode(String)
++ {static} String getUnits(CommandType)
+}
+
+
+class com.terminal.handlers.devices.BH1745NUCHandler {
+- EnumCommandMatcher<Command> matcher
++ boolean supports(String)
++ int getResponseDelayMs()
++ int specificity(String)
++ boolean expectsResponse(String)
++ CommandResult process(byte[],String,Map<String,String>)
+}
+
+
+enum com.terminal.handlers.devices.Command {
++  I2C_38_WRITE
++  I2C_38_READ
++  I2C_39_WRITE
++  I2C_39_READ
+- String prefix
+- boolean expectsResponse
+- int specificity
++ String getPrefix()
++ boolean expectsResponse()
++ int getSpecificity()
+}
+
+
+interface com.terminal.handlers.CommandHandler {
+~ boolean supports(String)
+~ int getResponseDelayMs()
+~ int specificity(String)
+~ boolean expectsResponse(String)
+~ CommandResult process(byte[],String,Map<String,String>)
+}
+
+class com.terminal.port.PortSession {
+- {static} int RECEIVE_TIMEOUT_MS
+- {static} int WAIT_STEP_MS
+- {static} int INTER_PACKET_DELAY_MS
+- PortID id
+- SessionListener listener
+- SerialPort serialPort
+- AtomicBoolean isOpen
++ boolean open(String,int)
++ boolean close()
++ boolean send(byte[])
++ byte[] receive()
+- void waitForData()
+- void setupSignalListener()
+- void notifyStateChange(boolean)
+- void log(String,LogType)
++ PortID getId()
++ SerialPort getSerialPort()
++ boolean isOpen()
++ String getPortName()
++ void setRTS(boolean)
++ void setDTR(boolean)
+}
+
+
+class com.terminal.controller.CoordinatedModeController {
+- Label firstStatusLabel
+- Label secondStatusLabel
+- Button previousStepButton
+- Button nextStepButton
+- Button repeatStepButton
+- Button resetStepButton
+- Button stopButton
+- ScrollPane dualScrollPane
+- TextFlow dualTextFlow
+- ComboBox<String> firstPortList
+- ComboBox<String> firstBaudRate
+- Button firstOpenDual
+- RadioButton firstRTS
+- RadioButton firstCTS
+- RadioButton firstDTR
+- RadioButton firstDSR
+- ComboBox<String> secondPortList
+- ComboBox<String> secondBaudRate
+- Button secondOpenDual
+- RadioButton secondRTS
+- RadioButton secondCTS
+- RadioButton secondDTR
+- RadioButton secondDSR
+- TextArea dualTextArea
+- TextField dualTimes
+- Text dualCounterRemainingTimes
+- TextField dualIntervals
+- Text dualStepMode
+- ScrollPane scrollPane
+- VBox additionalPortsBox
+- PortManager portManager
+- PlotterManager plotterManager
+- HandlerRegistry registry
+- ScriptEngine dualScriptEngine
+- {static} int INITIAL_ADDITIONAL_ROWS
+- {static} DateTimeFormatter FORMATTER
+- List<ComboBox<String>> additionalCombos
+- List<Button> additionalOpenButtons
+- List<Button> additionalAddButtons
+- int additionalPortIndex
+- ObservableList<String> portNames
+- ObservableList<String> baudRates
+- List<String> initCommand
+- List<String> dualStepModeCommands
+- int dualCommandIndex
+- BooleanProperty isSendBusy
++ void initialize()
++ void init()
+- void getComPorts()
+- void fillPortList(ComboBox<String>)
+- void fillBaudRate()
++ void mouseEvent(ComboBox<String>)
++ void firstOpen()
++ void secondOpen()
+- void openPort(PortID,Button,ComboBox<String>,ComboBox<String>)
++ void initFirstPort()
++ void initSecondPort()
++ void dualSend()
++ void dualNextStep()
++ void dualPreviousStep()
++ void dualRepeatCommand()
++ void dualRestartCommand()
++ void dualStopStepMode()
++ void addPrefix(PortID)
++ void addFirstPrefix()
++ void addSecondPrefix()
++ void addTimeout()
++ void appendText(String,Color)
++ void addFirstRTS()
++ void addFirstDTR()
++ void addSecondRTS()
++ void addSecondDTR()
++ void setFirstRTS()
++ void setFirstDTR()
++ void setSecondRTS()
++ void setSecondDTR()
++ void appendRow()
++ void removeRow()
++ HBox createRow()
+- PortID additionalPortID()
++ List<String> getCommandsList(TextArea)
++ void dualStop()
++ BooleanProperty getIsSendBusy()
++ void setPortManager(PortManager)
++ void setPlotterManager(PlotterManager)
++ List<ComboBox<String>> getAdditionalCombos()
++ List<Button> getAdditionalOpenButtons()
++ List<Button> getAdditionalAddButtons()
++ boolean isDualMode(PortID)
++ void updateStatusLabel(Labeled,boolean)
++ void insertCommandTemplate(PortID,String)
++ void highlightCommand(TextArea,List<String>,int)
++ void insertCommandIntoCaret(String)
++ void updatePortState(PortID,boolean)
++ void appendLog(PortID,String,LogType,LocalDateTime)
++ void writeControlSignal(PortID,String,boolean)
++ void readControlSignal(PortID,ControlSignal,boolean)
++ void appendUtilLog(PortID,String,LogType,LocalDateTime)
++ void updateCounter(PortID,int)
++ void updateBusyState(PortID,boolean)
+}
+
+
+enum com.terminal.controller.ViewMode {
++  SEPARATE
++  COORDINATED
++ {static} ViewMode DEFAULT
+- String text
++ String getText()
+}
+
+
+class com.terminal.config.Config {
+- {static} String CONFIG_DIR_NAME
+- {static} String APP_LOGS_DIR_NAME
+- {static} String CONFIG_FILE_NAME
+- {static} String SYNTAX_FILE_NAME
+- {static} String LOGBACK_FILE_NAME
+- {static} String DEFAULT_SCRIPTS_DIR
+- {static} String DEFAULT_LOGS_DIR
+- {static} String DEFAULT_UTILS_DIR
+- {static} Path exeDirectory
+- {static} Path configDirectory
+- {static} Path appLogsDirectory
+- {static} Path configFile
+- {static} Path syntaxFile
+- {static} Path scriptsDirectory
+- {static} Path logsDirectory
+- {static} Path utilsDirectory
+- {static} Logger log
++ {static} void load()
+- {static} void setDefaultProperties(Properties)
++ {static} void showConfig()
++ {static} void showSyntax()
++ {static} Path getScriptsDirectory()
++ {static} Path getLogsDirectory()
++ {static} Path getUtilsDirectory()
+}
+
+
+class com.terminal.model.AlertService {
++ {static} void alertError(Throwable,String,String)
+- {static} boolean isProjectClass(String)
+}
+
+
+
+javafx.application.Application <|-- com.terminal.Main
+com.terminal.controller.tabs.CommandTab <|.. com.terminal.controller.tabs.VoltageTab
+com.terminal.controller.ModeController <|.. com.terminal.controller.SeparateModeController
+com.terminal.utils.UtilsRunner +.. com.terminal.utils.UtilsRunner$RunningUtils
+com.terminal.handlers.CommandHandler <|.. com.terminal.handlers.devices.SC18IMHandler
+com.terminal.controller.tabs.VBox <|-- com.terminal.controller.tabs.BaseTabContent
+com.terminal.port.SessionListener <|.. com.terminal.port.SessionListenerManager
+com.terminal.port.SessionListenerManager +.. com.terminal.port.SessionListenerManager$ActiveControllerProvider
+com.terminal.controller.tabs.CommandTab <|.. com.terminal.controller.tabs.FrequencyTab
+com.terminal.controller.tabs.CommandTab <|.. com.terminal.controller.tabs.RelayTab
+com.terminal.handlers.CommandHandler <|.. com.terminal.handlers.DefaultCommandHandler
+com.terminal.handlers.CommandHandler <|.. com.terminal.handlers.devices.BH1745NUCHandler
+com.terminal.controller.ModeController <|.. com.terminal.controller.CoordinatedModeController
+@enduml
